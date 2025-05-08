@@ -1,0 +1,83 @@
+Climate Conference Analysis
+Database: https://www.db-fiddle.com/f/pxMci1sLL945KHKYvpe9W6/1
+
+--LEFT JOIN: Who are the VIPs, and where are they staying? (Order by last name.)
+SELECT 
+    vips.first_name,
+    vips.last_name,
+    hotels.hotel_name
+FROM vips
+LEFT JOIN reservations 
+	ON vips.member_id = reservations.member_id
+LEFT JOIN hotels 
+	ON reservations.hotel = hotels.hotel_id
+WHERE NOT hotel_name = "null"
+Order by vips.last_name asc;
+
+--INNER JOIN: Which VIPs said yes to both welcome and dinner, and where are they staying?
+SELECT 
+    vips.first_name,
+    vips.last_name,
+    hotels.hotel_name
+FROM vips
+INNER JOIN reservations 
+	ON vips.member_id = reservations.member_id
+INNER JOIN hotels 
+	ON reservations.hotel = hotels.hotel_id
+WHERE 
+    reservations.welcome_rsvp = 1 AND reservations.dinner_rsvp = 1
+    Order by vips.last_name asc;
+ 
+ --Multiple JOINs: Show VIPs, the events they’re attending, and their hotel names.
+ SELECT 
+    vips.first_name,
+    vips.last_name,
+    events.event_name,
+    hotels.hotel_name
+FROM vips
+JOIN events 
+	ON vips.event = events.event_id
+JOIN reservations 
+    ON vips.member_id = reservations.member_id
+JOIN hotels 
+	ON reservations.hotel = hotels.hotel_id
+    Order by hotels.hotel_name asc;
+    
+ --SELF JOIN: List all feedback relationships: who’s giving feedback to whom?
+ SELECT 
+    sender.first_name AS sender_first,
+    sender.last_name AS sender_last,
+    recipient.first_name AS recipient_first,
+    recipient.last_name AS recipient_last
+FROM 
+    vips sender
+JOIN 
+    vips recipient ON sender.provides_feedback_to = recipient.member_id
+    Order by sender.last_name asc;
+    
+--Custom Query: Which VIPs are staying at the same hotel as Nathan Chang?
+SELECT 
+    vips.first_name,
+    vips.last_name
+FROM vips
+JOIN reservations 
+	ON vips.member_id = reservations.member_id
+WHERE 
+    reservations.hotel = (
+        SELECT hotel
+        FROM vips
+        JOIN reservations ON vips.member_id = reservations.member_id
+        WHERE vips.first_name = 'Nathan' AND vips.last_name = 'Chang'
+    )
+AND NOT (vips.first_name = 'Nathan' AND vips.last_name = 'Chang')
+Order by  vips.last_name asc;
+
+--Custom Query: How many VIPs are staying at each hotel?
+SELECT 
+    hotels.hotel_name,
+    COUNT(reservations.member_id) AS vip_count
+FROM hotels
+LEFT JOIN 
+    reservations ON hotels.hotel_id = reservations.hotel
+GROUP BY 
+    hotels.hotel_name;
