@@ -1,5 +1,5 @@
 -- This analysis utilized the following Fortune 500 dataset:
-
+https://www.db-fiddle.com/f/saxdDCCyos6z6UdpjeEXSJ/100
 
 CREATE TABLE fortune_companies (
     company_id INTEGER PRIMARY KEY,
